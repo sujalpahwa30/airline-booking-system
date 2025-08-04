@@ -1,0 +1,48 @@
+services:
+  # Service 1: The API Gateway
+  api-gateway:
+    build: ./api-gateway-flights
+    container_name: api-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - FLIGHTS_SERVICE_URL=http://flights-service:3002
+      - BOOKING_SERVICE_URL=http://booking-service:3003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+
+  # Service 2: The Flights Service
+  flights-service:
+    build: ./flights-service
+    container_name: flights-service
+    environment:
+      - PORT=3002
+
+  # Service 3: The Booking Service
+  booking-service:
+    build: ./flight-booking-service
+    container_name: booking-service
+    environment:
+      - PORT=3003
+
+  # Service 4: The Notification Service
+  notification-service:
+    build: ./airline-notification-service
+    container_name: notification-service
+    environment:
+      - PORT=3004
+      - RABBITMQ_URL=amqp://rabbitmq
+    depends_on:
+      - rabbitmq 
+
+  # Service 5: RabbitMQ for messaging 
+  rabbitmq:
+    image: "rabbitmq:3.13-management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"  
+      - "15672:15672" 
+
+networks:
+  default:
+    name: airline_network

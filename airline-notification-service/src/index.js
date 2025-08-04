@@ -4,7 +4,7 @@ const amqplib = require("amqplib");
 const { EmailService } = require('./services');
 async function connectQueue() {
     try {
-        const connection = await amqplib.connect("amqp://localhost");
+        const connection = await amqplib.connect(ServerConfig.RABBITMQ_URL);
         const channel = await connection.createChannel();
         await channel.assertQueue("notification-queue");
         channel.consume("notification-queue", async (data) => {
