@@ -18,6 +18,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(limiter);
 
+console.log(ServerConfig.FLIGHT_SERVICE);
+
 app.use('/flightsService', createProxyMiddleware({
     target: ServerConfig.FLIGHT_SERVICE,
     changeOrigin: true,

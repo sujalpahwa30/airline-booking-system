@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile 
+    image: api-gateway:latest
+    container_name: api_gateway 
+    # map host port 3001 -> container port 3001 
+    ports: 
+      - "3001:3001"
+    # pass in your upstream service URLs as env-vars
+    environment:
+      - FLIGHT_SERVICE=http://host.docker.internal:3000
+      - BOOKING_SERVICE=http://host.docker.internal:4000
+    volumes:
+      - ./:/developer/nodejs/api-gateway
+      - api-gateway-node-modules:/developer/nodejs/api-gateway/node_modules
+
+volumes:
+  api-gateway-node-modules: 
+
+  
