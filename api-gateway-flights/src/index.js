@@ -1,4 +1,5 @@
 const express = require('express');
+const morgan = require('morgan');
 
 const rateLimit = require('express-rate-limit');
 const { createProxyMiddleware } = require('http-proxy-middleware');
@@ -17,6 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(limiter);
+
+app.use(morgan('dev'));
 
 console.log(ServerConfig.FLIGHT_SERVICE);
 

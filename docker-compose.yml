@@ -10,6 +10,11 @@ services:
       - FLIGHTS_SERVICE_URL=http://flights-service:3002
       - BOOKING_SERVICE_URL=http://booking-service:3003
       - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+    networks:
+      - airline_network 
+    depends_on:
+      - flights-service
+      - booking-service 
 
   # Service 2: The Flights Service
   flights-service:
@@ -17,6 +22,14 @@ services:
     container_name: flights-service
     environment:
       - PORT=3002
+      - DB_HOST=db
+      - DB_USER=app_user 
+      - DB_PASSWORD=S.P.king#100
+      - DB_NAME=Flights 
+    networks:
+      - airline_network
+    depends_on:
+      - db 
 
   # Service 3: The Booking Service
   booking-service:
@@ -24,6 +37,14 @@ services:
     container_name: booking-service
     environment:
       - PORT=3003
+      - DB_HOST=db
+      - DB_USER=app_user 
+      - DB_PASSWORD=S.P.king#100
+      - DB_NAME=Flights
+    networks:
+      - airline_network 
+    depends_on:
+      - db 
 
   # Service 4: The Notification Service
   notification-service:
@@ -32,8 +53,11 @@ services:
     environment:
       - PORT=3004
       - RABBITMQ_URL=amqp://rabbitmq
+    networks:
+      - airline_network 
     depends_on:
-      - rabbitmq 
+      rabbitmq:
+       condition: service_healthy 
 
   # Service 5: RabbitMQ for messaging 
   rabbitmq:
@@ -41,8 +65,30 @@ services:
     container_name: rabbitmq
     ports:
       - "5672:5672"  
-      - "15672:15672" 
+      - "15672:15672"
+    networks:
+      - airline_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_running", "-q"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+  # Service 6: MySQL Database 
+  db:
+    image: mysql:8.0
+    container_name: db 
+    restart: always 
+    environment:
+      MYSQL_ROOT_PASSWORD: "S.P.king#100"
+      MYSQL_DATABASE: "Flights"
+      MYSQL_USER: "app_user"
+      MYSQL_PASSWORD: "S.P.king#100"
+    ports:
+      - "3307:3306"
+    networks:
+      - airline_network 
 
 networks:
-  default:
-    name: airline_network
+  airline_network:
+    driver: bridge 
